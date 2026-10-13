@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Уроки и оплаты</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#0f1115; --surface:#171a21; --surface2:#1f232c; --line:#2a2f3a;
+  --text:#e8eaf0; --muted:#8b92a3; --accent:#7c9cff; --accent2:#5b7cf0;
+  --green:#3ecf8e; --red:#ff6b6b; --amber:#ffc35c;
+  --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.wrap{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;margin:4px 0 16px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+  background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.icon-btn:hover{color:var(--text)}
+.icon-btn svg{width:20px;height:20px}
+.hdr-actions{display:flex;gap:8px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.stat .lbl{color:var(--muted);font-size:12px}
+.stat .val{font-size:20px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat.debt .val{color:var(--amber)}
+.stat.got .val{color:var(--green)}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;display:flex;align-items:center;gap:12px}
+.card .info{flex:1;min-width:0;cursor:pointer}
+.card .name{font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.card .sub b{color:var(--amber);font-weight:600}
+.card .sub .ok{color:var(--green)}
+.plus{width:48px;height:48px;border-radius:14px;background:var(--surface2);
+  border:1px solid var(--line);font-size:26px;line-height:1;color:var(--accent);flex:none}
+.plus:active{transform:scale(.94)}
+.pay{height:48px;padding:0 14px;border-radius:14px;background:var(--green);color:#06281a;
+  font-weight:650;flex:none;min-width:96px;font-variant-numeric:tabular-nums}
+.pay:disabled{background:var(--surface2);color:var(--muted);border:1px solid var(--line);cursor:default}
+.pay:not(:disabled):active{transform:scale(.96)}
+
+.empty{text-align:center;color:var(--muted);padding:48px 16px;border:1px dashed var(--line);border-radius:var(--r)}
+.section-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:22px 0 8px}
+
+.fab{position:fixed;right:max(16px,calc(50% - 344px));bottom:calc(20px + env(safe-area-inset-bottom));
+  height:52px;padding:0 20px;border-radius:16px;background:var(--accent);color:#0b1230;
+  font-weight:650;box-shadow:0 8px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px}
+.fab span{font-size:22px;line-height:1}
+
+dialog{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:18px;
+  padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 48px)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+.dlg-h{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px}
+.dlg-h h2{margin:0;font-size:18px}
+.dlg-b{padding:8px 16px 16px;overflow:auto;max-height:calc(100vh - 140px)}
+label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
+input[type=text],input[type=number],input[type=date]{width:100%;background:var(--bg);border:1px solid var(--line);
+  border-radius:12px;padding:12px;outline:none;color-scheme:dark}
+input:focus{border-color:var(--accent)}
+.chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.chip{padding:6px 12px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);font-size:13px}
+.row{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;height:46px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);font-weight:600}
+.btn.primary{background:var(--accent);color:#0b1230;border-color:transparent}
+.btn.danger{color:var(--red)}
+.btn.small{flex:none;height:38px;padding:0 12px;font-size:14px}
+
+.hist{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.h-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);
+  border:1px solid var(--line);border-radius:12px;font-variant-numeric:tabular-nums}
+.h-item .d{flex:1}
+.h-item .st{font-size:12px;padding:2px 8px;border-radius:999px}
+.st.unpaid{background:rgba(255,195,92,.12);color:var(--amber)}
+.st.paid{background:rgba(62,207,142,.12);color:var(--green)}
+.h-item .x{color:var(--muted);width:28px;height:28px;border-radius:8px}
+.h-item .x:hover{color:var(--red);background:var(--surface2)}
+.h-item.payment{border-style:dashed}
+.muted{color:var(--muted)}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 6px}
+.summary div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px}
+.summary small{color:var(--muted);display:block;font-size:12px}
+.summary b{font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;margin:14px 0 4px}
+.tab{padding:7px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.tab.on{color:var(--text);border-color:var(--accent)}
+
+.months{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.months td,.months th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right}
+.months th{color:var(--muted);font-weight:500;font-size:12px}
+.months td:first-child,.months th:first-child{text-align:left}
+
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 16px;
+  display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:.2s;z-index:50;
+  max-width:calc(100vw - 32px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast button{color:var(--accent);font-weight:650}
+.note{font-size:13px;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px}
+@media (max-width:420px){
+  .stat .val{font-size:17px}
+  .pay{min-width:84px;padding:0 10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Ученики</h1>
+    <div class="hdr-actions">
+      <button class="icon-btn" id="btnStats" title="Статистика по месяцам">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      </button>
+      <button class="icon-btn" id="btnSettings" title="Бэкап и настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat debt"><div class="lbl">Должны</div><div class="val" id="sDebt">0 €</div></div>
+    <div class="stat got"><div class="lbl" id="sGotLbl">Получено</div><div class="val" id="sGot">0 €</div></div>
+    <div class="stat"><div class="lbl" id="sLessonsLbl">Уроков</div><div class="val" id="sLessons">0</div></div>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div id="archivedWrap"></div>
+</div>
+
+<button class="fab" id="btnAdd"><span>+</span> Ученик</button>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo">Отменить</button></div>
+
+<!-- Add / edit student -->
+<dialog id="dlgStudent">
+  <form method="dialog" id="formStudent">
+    <div class="dlg-h"><h2 id="dlgStudentTitle">Новый ученик</h2></div>
+    <div class="dlg-b">
+      <label for="fName">Имя</label>
+      <input type="text" id="fName" required autocomplete="off" placeholder="Например, Глеб">
+      <label for="fPrice">Цена за урок, €</label>
+      <input type="number" id="fPrice" required min="0" step="0.5" inputmode="decimal" value="15">
+      <div class="chips" id="priceChips"></div>
+      <div class="row">
+        <button type="button" class="btn" data-close>Отмена</button>
+        <button type="submit" class="btn primary">Сохранить</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- Student detail -->
+<dialog id="dlgDetail">
+  <div class="dlg-h">
+    <h2 id="dName"></h2>
+    <button class="icon-btn" data-close title="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="dlg-b">
+    <div class="summary" id="dSummary"></div>
+
+    <label for="dDate">Добавить урок задним числом</label>
+    <div style="display:flex;gap:8px">
+      <input type="date" id="dDate">
+      <button class="btn small primary" id="dAddDated">+ урок</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-tab="lessons">Уроки</button>
+      <button class="tab" data-tab="payments">Оплаты</button>
+    </div>
+    <div class="hist" id="dHist"></div>
+
+    <div class="row">
+      <button class="btn" id="dEdit">Изменить</button>
+      <button class="btn" id="dArchive">В архив</button>
+      <button class="btn danger" id="dDelete">Удалить</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Stats -->
+<dialog id="dlgStats">
+  <div class="dlg-h">
+    <h2>По месяцам</h2>
+    <button class="icon-btn" data-close title="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="dlg-b">
+    <table class="months" id="monthsTable"></table>
+    <div class="note">«Проведено» — сумма уроков, проведённых в месяце. «Получено» — сколько реально пришло денег в этом месяце.</div>
+  </div>
+</dialog>
+
+<!-- Settings / backup -->
+<dialog id="dlgSettings">
+  <div class="dlg-h">
+    <h2>Бэкап</h2>
+    <button class="icon-btn" data-close title="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="dlg-b">
+    <div class="note" id="backupInfo"></div>
+    <div class="row">
+      <button class="btn primary" id="btnExport">Скачать бэкап</button>
+      <button class="btn" id="btnImport">Загрузить бэкап</button>
+    </div>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <div class="note">Данные хранятся только в этом браузере на этом устройстве. Чтобы перенести на телефон или другой комп — скачай бэкап здесь и загрузи там.</div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  'use strict';
+  const KEY = 'tutor-ledger-v1';
+  const $ = s => document.querySelector(s);
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const eur = n => (Math.round(n * 100) / 100).toLocaleString('ru-RU', {maximumFractionDigits: 2}) + ' €';
+  const MONTHS = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+  const MONTHS_IN = ['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
+  const fmtDate = iso => new Date(iso).toLocaleDateString('ru-RU', {day:'2-digit', month:'2-digit', year:'2-digit'});
+  const fmtDateLong = iso => new Date(iso).toLocaleDateString('ru-RU', {weekday:'short', day:'numeric', month:'short'});
+  const monthKey = iso => { const d = new Date(iso); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+  const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+  const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100;
+    return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); };
+
+  // ---------- storage ----------
+  const empty = () => ({v: 1, students: [], lessons: [], payments: [], lastBackup: null});
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return empty();
+      const d = JSON.parse(raw);
+      return Object.assign(empty(), d);
+    } catch (e) { console.error(e); return empty(); }
+  }
+  let db = load();
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(db)); }
+    catch (e) { alert('Не получилось сохранить: ' + e.message); }
+  }
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+  // ---------- undo ----------
+  let undoSnap = null, toastTimer = null;
+  function snapshot() { undoSnap = JSON.stringify(db); }
+  function toast(msg, undoable = true) {
+    $('#toastMsg').textContent = msg;
+    $('#toastUndo').style.display = undoable ? '' : 'none';
+    $('#toast').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $('#toast').classList.remove('show'); undoSnap = null; }, 5000);
+  }
+  $('#toastUndo').onclick = () => {
+    if (!undoSnap) return;
+    db = JSON.parse(undoSnap); undoSnap = null; save(); render(); refreshDetail();
+    $('#toast').classList.remove('show');
+  };
+
+  // ---------- domain ----------
+  const student = id => db.students.find(s => s.id === id);
+  const lessonsOf = sid => db.lessons.filter(l => l.sid === sid);
+  const unpaidOf = sid => lessonsOf(sid).filter(l => !l.paidAt);
+  const debtOf = sid => unpaidOf(sid).reduce((a, l) => a + l.price, 0);
+
+  function addLesson(sid, dateIso) {
+    const s = student(sid); if (!s) return;
+    snapshot();
+    db.lessons.push({id: uid(), sid, date: dateIso || new Date().toISOString(), price: s.price, paidAt: null, payId: null});
+    save(); render(); refreshDetail();
+    const n = unpaidOf(sid).length;
+    toast(`${s.name}: +1 урок · не оплачено ${n}`);
+  }
+  function pay(sid) {
+    const s = student(sid); const un = unpaidOf(sid);
+    if (!s || !un.length) return;
+    snapshot();
+    const now = new Date().toISOString(), payId = uid();
+    const amount = un.reduce((a, l) => a + l.price, 0);
+    un.forEach(l => { l.paidAt = now; l.payId = payId; });
+    db.payments.push({id: payId, sid, date: now, amount, count: un.length});
+    save(); render(); refreshDetail();
+    toast(`${s.name}: оплачено ${eur(amount)} за ${un.length} ${plural(un.length,'урок','урока','уроков')}`);
+  }
+  function deleteLesson(lid) {
+    const l = db.lessons.find(x => x.id === lid); if (!l) return;
+    snapshot();
+    db.lessons = db.lessons.filter(x => x.id !== lid);
+    if (l.payId) {
+      const p = db.payments.find(p => p.id === l.payId);
+      if (p) { p.amount -= l.price; p.count -= 1; if (p.count <= 0) db.payments = db.payments.filter(x => x !== p); }
+    }
+    save(); render(); refreshDetail(); toast('Урок удалён');
+  }
+  function deletePayment(pid) {
+    snapshot();
+    db.lessons.forEach(l => { if (l.payId === pid) { l.paidAt = null; l.payId = null; } });
+    db.payments = db.payments.filter(p => p.id !== pid);
+    save(); render(); refreshDetail(); toast('Оплата отменена, уроки снова в долге');
+  }
+
+  // ---------- main render ----------
+  function render() {
+    const now = new Date(), mk = monthKey(now.toISOString());
+    const active = db.students.filter(s => !s.archived);
+    const archived = db.students.filter(s => s.archived);
+
+    $('#sDebt').textContent = eur(db.lessons.filter(l => !l.paidAt).reduce((a, l) => a + l.price, 0));
+    $('#sGotLbl').textContent = 'Получено в ' + MONTHS_IN[now.getMonth()];
+    $('#sGot').textContent = eur(db.payments.filter(p => monthKey(p.date) === mk).reduce((a, p) => a + p.amount, 0));
+    $('#sLessonsLbl').textContent = 'Уроков в ' + MONTHS_IN[now.getMonth()];
+    $('#sLessons').textContent = db.lessons.filter(l => monthKey(l.date) === mk).length;
+
+    // order: those with debt first (bigger first), then by name
+    active.sort((a, b) => (debtOf(b.id) - debtOf(a.id)) || a.name.localeCompare(b.name, 'ru'));
+
+    $('#list').innerHTML = active.length ? active.map(cardHtml).join('') :
+      `<div class="empty">Пока нет учеников.<br>Нажми «+ Ученик» внизу.</div>`;
+
+    $('#archivedWrap').innerHTML = archived.length
+      ? `<div class="section-title">Архив</div><div class="list">${archived.map(cardHtml).join('')}</div>` : '';
+  }
+  function cardHtml(s) {
+    const un = unpaidOf(s.id), debt = debtOf(s.id);
+    const sub = un.length
+      ? `Не оплачено: <b>${un.length} ${plural(un.length,'урок','урока','уроков')}</b> · ${eur(s.price)}/урок`
+      : `<span class="ok">Всё оплачено</span> · ${eur(s.price)}/урок`;
+    return `<div class="card" data-id="${s.id}" ${s.archived ? 'style="opacity:.6"' : ''}>
+      <div class="info" data-act="open"><div class="name">${esc(s.name)}</div><div class="sub">${sub}</div></div>
+      ${s.archived ? '' : `<button class="plus" data-act="plus" title="Добавить урок" aria-label="Добавить урок">+</button>`}
+      <button class="pay" data-act="pay" ${un.length ? '' : 'disabled'}>${un.length ? 'Оплатить ' + eur(debt) : 'Оплачено'}</button>
+    </div>`;
+  }
+  document.body.addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]'); if (!btn) return;
+    const card = btn.closest('.card'); if (!card) return;
+    const id = card.dataset.id, act = btn.dataset.act;
+    if (act === 'plus') addLesson(id);
+    else if (act === 'pay') pay(id);
+    else if (act === 'open') openDetail(id);
+  });
+
+  // ---------- dialogs common ----------
+  document.querySelectorAll('dialog').forEach(d => {
+    d.addEventListener('click', e => {
+      if (e.target === d || e.target.closest('[data-close]')) d.close();
+    });
+  });
+
+  // ---------- add/edit student ----------
+  let editingId = null;
+  function priceChips() {
+    const used = [...new Set([15, 20, ...db.students.map(s => s.price)])].sort((a, b) => a - b);
+    $('#priceChips').innerHTML = used.map(p => `<button type="button" class="chip" data-p="${p}">${eur(p)}</button>`).join('');
+  }
+  $('#priceChips').onclick = e => { const c = e.target.closest('[data-p]'); if (c) $('#fPrice').value = c.dataset.p; };
+  function openStudentForm(id) {
+    editingId = id || null;
+    const s = id ? student(id) : null;
+    $('#dlgStudentTitle').textContent = s ? 'Изменить ученика' : 'Новый ученик';
+    $('#fName').value = s ? s.name : '';
+    $('#fPrice').value = s ? s.price : 15;
+    priceChips();
+    $('#dlgStudent').showModal();
+    setTimeout(() => $('#fName').focus(), 50);
+  }
+  $('#btnAdd').onclick = () => openStudentForm();
+  $('#formStudent').addEventListener('submit', e => {
+    const name = $('#fName').value.trim(), price = parseFloat($('#fPrice').value);
+    if (!name || !(price >= 0)) { e.preventDefault(); return; }
+    if (editingId) {
+      const s = student(editingId);
+      const changedPrice = s.price !== price;
+      s.name = name; s.price = price;
+      if (changedPrice && unpaidOf(s.id).length &&
+          confirm(`Пересчитать ${unpaidOf(s.id).length} неоплаченных уроков по новой цене ${eur(price)}?`)) {
+        unpaidOf(s.id).forEach(l => l.price = price);
+      }
+    } else {
+      db.students.push({id: uid(), name, price, archived: false, createdAt: new Date().toISOString()});
+    }
+    save(); render(); refreshDetail();
+  });
+
+  // ---------- detail ----------
+  let detailId = null, detailTab = 'lessons';
+  function openDetail(id) {
+    detailId = id; detailTab = 'lessons';
+    $('#dDate').value = todayStr();
+    refreshDetail();
+    $('#dlgDetail').showModal();
+  }
+  function refreshDetail() {
+    if (!detailId || !$('#dlgDetail').open && detailId === null) return;
+    const s = student(detailId);
+    if (!s) { $('#dlgDetail').close(); detailId = null; return; }
+    const ls = lessonsOf(s.id).sort((a, b) => b.date.localeCompare(a.date));
+    const total = db.payments.filter(p => p.sid === s.id).reduce((a, p) => a + p.amount, 0);
+    $('#dName').textContent = s.name;
+    $('#dSummary').innerHTML = `
+      <div><small>Всего уроков</small><b>${ls.length}</b></div>
+      <div><small>Долг</small><b style="color:var(--amber)">${eur(debtOf(s.id))}</b></div>
+      <div><small>Заплатил всего</small><b style="color:var(--green)">${eur(total)}</b></div>`;
+    $('#dArchive').textContent = s.archived ? 'Из архива' : 'В архив';
+    document.querySelectorAll('#dlgDetail .tab').forEach(t => t.classList.toggle('on', t.dataset.tab === detailTab));
+
+    if (detailTab === 'lessons') {
+      $('#dHist').innerHTML = ls.length ? ls.map(l => `
+        <div class="h-item">
+          <span class="d">${fmtDateLong(l.date)}</span>
+          <span>${eur(l.price)}</span>
+          <span class="st ${l.paidAt ? 'paid' : 'unpaid'}">${l.paidAt ? 'опл. ' + fmtDate(l.paidAt) : 'долг'}</span>
+          <button class="x" data-del-lesson="${l.id}" title="Удалить урок">✕</button>
+        </div>`).join('') : `<div class="muted">Уроков пока нет</div>`;
+    } else {
+      const ps = db.payments.filter(p => p.sid === s.id).sort((a, b) => b.date.localeCompare(a.date));
+      $('#dHist').innerHTML = ps.length ? ps.map(p => `
+        <div class="h-item payment">
+          <span class="d">${fmtDateLong(p.date)}</span>
+          <span class="muted">${p.count} ${plural(p.count,'урок','урока','уроков')}</span>
+          <span style="color:var(--green)">${eur(p.amount)}</span>
+          <button class="x" data-del-pay="${p.id}" title="Отменить оплату">✕</button>
+        </div>`).join('') : `<div class="muted">Оплат пока нет</div>`;
+    }
+  }
+  document.querySelectorAll('#dlgDetail .tab').forEach(t => t.onclick = () => { detailTab = t.dataset.tab; refreshDetail(); });
+  $('#dHist').onclick = e => {
+    const l = e.target.closest('[data-del-lesson]'), p = e.target.closest('[data-del-pay]');
+    if (l) deleteLesson(l.dataset.delLesson);
+    if (p && confirm('Отменить эту оплату? Уроки снова станут неоплаченными.')) deletePayment(p.dataset.delPay);
+  };
+  $('#dAddDated').onclick = () => {
+    const v = $('#dDate').value; if (!v) return;
+    const [y, m, d] = v.split('-').map(Number);
+    const now = new Date();
+    addLesson(detailId, new Date(y, m - 1, d, now.getHours(), now.getMinutes()).toISOString());
+  };
+  $('#dEdit').onclick = () => openStudentForm(detailId);
+  $('#dArchive').onclick = () => {
+    const s = student(detailId); snapshot(); s.archived = !s.archived; save(); render(); refreshDetail();
+    toast(s.archived ? `${s.name} в архиве` : `${s.name} снова активен`);
+  };
+  $('#dDelete').onclick = () => {
+    const s = student(detailId);
+    if (!confirm(`Удалить ${s.name} вместе со всеми уроками и оплатами?`)) return;
+    snapshot();
+    db.students = db.students.filter(x => x.id !== s.id);
+    db.lessons = db.lessons.filter(x => x.sid !== s.id);
+    db.payments = db.payments.filter(x => x.sid !== s.id);
+    save(); $('#dlgDetail').close(); detailId = null; render(); toast(`${s.name} удалён`);
+  };
+  $('#dlgDetail').addEventListener('close', () => { detailId = null; });
+
+  // ---------- stats ----------
+  $('#btnStats').onclick = () => {
+    const map = {};
+    const bump = k => map[k] || (map[k] = {cnt: 0, done: 0, got: 0});
+    db.lessons.forEach(l => { const m = bump(monthKey(l.date)); m.cnt++; m.done += l.price; });
+    db.payments.forEach(p => { bump(monthKey(p.date)).got += p.amount; });
+    const keys = Object.keys(map).sort().reverse();
+    $('#monthsTable').innerHTML = keys.length
+      ? `<tr><th>Месяц</th><th>Уроков</th><th>Проведено</th><th>Получено</th></tr>` +
+        keys.map(k => { const [y, m] = k.split('-'); const r = map[k];
+          return `<tr><td>${MONTHS[+m - 1]} ${y}</td><td>${r.cnt}</td><td>${eur(r.done)}</td><td style="color:var(--green)">${eur(r.got)}</td></tr>`; }).join('')
+      : `<tr><td class="muted">Пока пусто</td></tr>`;
+    $('#dlgStats').showModal();
+  };
+
+  // ---------- backup ----------
+  function backupInfo() {
+    $('#backupInfo').textContent = db.lastBackup
+      ? `Последний бэкап: ${new Date(db.lastBackup).toLocaleString('ru-RU')}`
+      : 'Бэкап ещё ни разу не делался.';
+  }
+  $('#btnSettings').onclick = () => { backupInfo(); $('#dlgSettings').showModal(); };
+  $('#btnExport').onclick = () => {
+    db.lastBackup = new Date().toISOString(); save();
+    const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `uroki-backup-${todayStr()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    backupInfo();
+  };
+  $('#btnImport').onclick = () => $('#fileImport').click();
+  $('#fileImport').onchange = async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try {
+      const d = JSON.parse(await f.text());
+      if (!Array.isArray(d.students) || !Array.isArray(d.lessons)) throw new Error('не похоже на бэкап');
+      if (!confirm(`Заменить текущие данные бэкапом? (${d.students.length} учеников, ${d.lessons.length} уроков)`)) return;
+      snapshot(); db = Object.assign(empty(), d); save(); render();
+      $('#dlgSettings').close(); toast('Бэкап загружен');
+    } catch (err) { alert('Не получилось прочитать файл: ' + err.message); }
+  };
+
+  // sync between tabs
+  window.addEventListener('storage', e => { if (e.key === KEY) { db = load(); render(); refreshDetail(); } });
+
+  render();
+
+  // offline / installable
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
