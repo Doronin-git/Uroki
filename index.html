@@ -30,14 +30,14 @@ h1{font-size:22px;margin:0;letter-spacing:-.01em}
 .icon-btn:hover{color:var(--text)}
 .icon-btn svg{width:20px;height:20px}
 .hdr-actions{display:flex;gap:8px}
- 
+
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
 .stat .lbl{color:var(--muted);font-size:12px}
 .stat .val{font-size:20px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
 .stat.debt .val{color:var(--amber)}
 .stat.got .val{color:var(--green)}
- 
+
 .list{display:flex;flex-direction:column;gap:10px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
   padding:14px;display:flex;align-items:center;gap:12px}
@@ -53,15 +53,15 @@ h1{font-size:22px;margin:0;letter-spacing:-.01em}
   font-weight:650;flex:none;min-width:96px;font-variant-numeric:tabular-nums}
 .pay:disabled{background:var(--surface2);color:var(--muted);border:1px solid var(--line);cursor:default}
 .pay:not(:disabled):active{transform:scale(.96)}
- 
+
 .empty{text-align:center;color:var(--muted);padding:48px 16px;border:1px dashed var(--line);border-radius:var(--r)}
 .section-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:22px 0 8px}
- 
+
 .fab{position:fixed;right:max(16px,calc(50% - 344px));bottom:calc(20px + env(safe-area-inset-bottom));
   height:52px;padding:0 20px;border-radius:16px;background:var(--accent);color:#0b1230;
   font-weight:650;box-shadow:0 8px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px}
 .fab span{font-size:22px;line-height:1}
- 
+
 dialog{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:18px;
   padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 48px)}
 dialog::backdrop{background:rgba(0,0,0,.6)}
@@ -79,7 +79,7 @@ input:focus{border-color:var(--accent)}
 .btn.primary{background:var(--accent);color:#0b1230;border-color:transparent}
 .btn.danger{color:var(--red)}
 .btn.small{flex:none;height:38px;padding:0 12px;font-size:14px}
- 
+
 .hist{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .h-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);
   border:1px solid var(--line);border-radius:12px;font-variant-numeric:tabular-nums}
@@ -98,12 +98,12 @@ input:focus{border-color:var(--accent)}
 .tabs{display:flex;gap:6px;margin:14px 0 4px}
 .tab{padding:7px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:13px;color:var(--muted)}
 .tab.on{color:var(--text);border-color:var(--accent)}
- 
+
 .months{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .months td,.months th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right}
 .months th{color:var(--muted);font-weight:500;font-size:12px}
 .months td:first-child,.months th:first-child{text-align:left}
- 
+
 .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
   background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 16px;
   display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:.2s;z-index:50;
@@ -130,20 +130,20 @@ input:focus{border-color:var(--accent)}
       </button>
     </div>
   </header>
- 
+
   <div class="stats">
     <div class="stat debt"><div class="lbl">Должны</div><div class="val" id="sDebt">0 €</div></div>
     <div class="stat got"><div class="lbl" id="sGotLbl">Получено</div><div class="val" id="sGot">0 €</div></div>
     <div class="stat"><div class="lbl" id="sLessonsLbl">Уроков</div><div class="val" id="sLessons">0</div></div>
   </div>
- 
+
   <div class="list" id="list"></div>
   <div id="archivedWrap"></div>
 </div>
- 
+
 <button class="fab" id="btnAdd"><span>+</span> Ученик</button>
 <div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo">Отменить</button></div>
- 
+
 <!-- Add / edit student -->
 <dialog id="dlgStudent">
   <form method="dialog" id="formStudent">
@@ -161,7 +161,7 @@ input:focus{border-color:var(--accent)}
     </div>
   </form>
 </dialog>
- 
+
 <!-- Student detail -->
 <dialog id="dlgDetail">
   <div class="dlg-h">
@@ -172,19 +172,19 @@ input:focus{border-color:var(--accent)}
   </div>
   <div class="dlg-b">
     <div class="summary" id="dSummary"></div>
- 
+
     <label for="dDate">Добавить урок задним числом</label>
     <div style="display:flex;gap:8px">
       <input type="date" id="dDate">
       <button class="btn small primary" id="dAddDated">+ урок</button>
     </div>
- 
+
     <div class="tabs">
       <button class="tab on" data-tab="lessons">Уроки</button>
       <button class="tab" data-tab="payments">Оплаты</button>
     </div>
     <div class="hist" id="dHist"></div>
- 
+
     <div class="row">
       <button class="btn" id="dEdit">Изменить</button>
       <button class="btn" id="dArchive">В архив</button>
@@ -192,7 +192,7 @@ input:focus{border-color:var(--accent)}
     </div>
   </div>
 </dialog>
- 
+
 <!-- Stats -->
 <dialog id="dlgStats">
   <div class="dlg-h">
@@ -206,7 +206,7 @@ input:focus{border-color:var(--accent)}
     <div class="note">«Проведено» — сумма уроков, проведённых в месяце. «Получено» — сколько реально пришло денег в этом месяце.</div>
   </div>
 </dialog>
- 
+
 <!-- Settings / backup -->
 <dialog id="dlgSettings">
   <div class="dlg-h">
@@ -225,7 +225,7 @@ input:focus{border-color:var(--accent)}
     <div class="note">Данные хранятся только в этом браузере на этом устройстве. Чтобы перенести на телефон или другой комп — скачай бэкап здесь и загрузи там.</div>
   </div>
 </dialog>
- 
+
 <script>
 (() => {
   'use strict';
@@ -242,7 +242,7 @@ input:focus{border-color:var(--accent)}
   const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
   const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100;
     return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); };
- 
+
   // ---------- storage ----------
   const empty = () => ({v: 1, students: [], lessons: [], payments: [], lastBackup: null});
   function load() {
@@ -259,7 +259,7 @@ input:focus{border-color:var(--accent)}
     catch (e) { alert('Не получилось сохранить: ' + e.message); }
   }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
- 
+
   // ---------- undo ----------
   let undoSnap = null, toastTimer = null;
   function snapshot() { undoSnap = JSON.stringify(db); }
@@ -275,13 +275,13 @@ input:focus{border-color:var(--accent)}
     db = JSON.parse(undoSnap); undoSnap = null; save(); render(); refreshDetail();
     $('#toast').classList.remove('show');
   };
- 
+
   // ---------- domain ----------
   const student = id => db.students.find(s => s.id === id);
   const lessonsOf = sid => db.lessons.filter(l => l.sid === sid);
   const unpaidOf = sid => lessonsOf(sid).filter(l => !l.paidAt);
   const debtOf = sid => unpaidOf(sid).reduce((a, l) => a + l.price, 0);
- 
+
   function addLesson(sid, dateIso) {
     const s = student(sid); if (!s) return;
     snapshot();
@@ -317,27 +317,27 @@ input:focus{border-color:var(--accent)}
     db.payments = db.payments.filter(p => p.id !== pid);
     save(); render(); refreshDetail(); toast('Оплата отменена, уроки снова в долге');
   }
- 
+
   // ---------- main render ----------
   function render() {
     const now = new Date(), mk = monthKey(now.toISOString());
     const active = db.students.filter(s => !s.archived);
     const archived = db.students.filter(s => s.archived);
- 
+
     $('#sDebt').textContent = eur(db.lessons.filter(l => !l.paidAt).reduce((a, l) => a + l.price, 0));
     $('#sGotLbl').textContent = 'Получено в ' + MONTHS_IN[now.getMonth()];
     $('#sGot').textContent = eur(db.payments.filter(p => monthKey(p.date) === mk).reduce((a, p) => a + p.amount, 0));
     $('#sLessonsLbl').textContent = 'Уроков в ' + MONTHS_IN[now.getMonth()];
     $('#sLessons').textContent = db.lessons.filter(l => monthKey(l.date) === mk).length;
- 
+
     // stable alphabetical order
     const byName = (a, b) => a.name.localeCompare(b.name, 'ru');
     active.sort(byName);
     archived.sort(byName);
- 
+
     $('#list').innerHTML = active.length ? active.map(cardHtml).join('') :
       `<div class="empty">Пока нет учеников.<br>Нажми «+ Ученик» внизу.</div>`;
- 
+
     $('#archivedWrap').innerHTML = archived.length
       ? `<div class="section-title">Архив</div><div class="list">${archived.map(cardHtml).join('')}</div>` : '';
   }
@@ -360,14 +360,14 @@ input:focus{border-color:var(--accent)}
     else if (act === 'pay') pay(id);
     else if (act === 'open') openDetail(id);
   });
- 
+
   // ---------- dialogs common ----------
   document.querySelectorAll('dialog').forEach(d => {
     d.addEventListener('click', e => {
       if (e.target === d || e.target.closest('[data-close]')) d.close();
     });
   });
- 
+
   // ---------- add/edit student ----------
   let editingId = null;
   function priceChips() {
@@ -402,7 +402,7 @@ input:focus{border-color:var(--accent)}
     }
     save(); render(); refreshDetail();
   });
- 
+
   // ---------- detail ----------
   let detailId = null, detailTab = 'lessons';
   function openDetail(id) {
@@ -424,7 +424,7 @@ input:focus{border-color:var(--accent)}
       <div><small>Заплатил всего</small><b style="color:var(--green)">${eur(total)}</b></div>`;
     $('#dArchive').textContent = s.archived ? 'Из архива' : 'В архив';
     document.querySelectorAll('#dlgDetail .tab').forEach(t => t.classList.toggle('on', t.dataset.tab === detailTab));
- 
+
     if (detailTab === 'lessons') {
       $('#dHist').innerHTML = ls.length ? ls.map(l => `
         <div class="h-item">
@@ -471,7 +471,7 @@ input:focus{border-color:var(--accent)}
     save(); $('#dlgDetail').close(); detailId = null; render(); toast(`${s.name} удалён`);
   };
   $('#dlgDetail').addEventListener('close', () => { detailId = null; });
- 
+
   // ---------- stats ----------
   $('#btnStats').onclick = () => {
     const map = {};
@@ -486,7 +486,7 @@ input:focus{border-color:var(--accent)}
       : `<tr><td class="muted">Пока пусто</td></tr>`;
     $('#dlgStats').showModal();
   };
- 
+
   // ---------- backup ----------
   function backupInfo() {
     $('#backupInfo').textContent = db.lastBackup
@@ -515,12 +515,12 @@ input:focus{border-color:var(--accent)}
       $('#dlgSettings').close(); toast('Бэкап загружен');
     } catch (err) { alert('Не получилось прочитать файл: ' + err.message); }
   };
- 
+
   // sync between tabs
   window.addEventListener('storage', e => { if (e.key === KEY) { db = load(); render(); refreshDetail(); } });
- 
+
   render();
- 
+
   // offline / installable
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -529,4 +529,5 @@ input:focus{border-color:var(--accent)}
 </script>
 </body>
 </html>
+
  
